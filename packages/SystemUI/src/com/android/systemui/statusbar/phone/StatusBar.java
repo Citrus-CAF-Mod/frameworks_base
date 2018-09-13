@@ -238,6 +238,7 @@ import com.android.systemui.statusbar.policy.NetworkController;
 import com.android.systemui.statusbar.policy.OnHeadsUpChangedListener;
 import com.android.systemui.statusbar.policy.PreviewInflater;
 import com.android.systemui.statusbar.policy.RemoteInputQuickSettingsDisabler;
+import com.android.systemui.statusbar.policy.TelephonyIcons;
 import com.android.systemui.statusbar.policy.UserInfoController;
 import com.android.systemui.statusbar.policy.UserInfoControllerImpl;
 import com.android.systemui.statusbar.policy.UserSwitcherController;
@@ -336,6 +337,8 @@ public class StatusBar extends SystemUI implements DemoMode,
      * libhwui.
      */
     private static final float SRC_MIN_ALPHA = 0.002f;
+
+    public static boolean USE_OLD_MOBILETYPE = false;
 
     static {
         boolean onlyCoreApps;
@@ -630,6 +633,31 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     private boolean mLockscreenMediaMetadata;
 
+    private class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            mContext.getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.USE_OLD_MOBILETYPE),
+                    false, this, UserHandle.USER_ALL);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            update();
+        }
+
+        public void update() {
+            USE_OLD_MOBILETYPE = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.USE_OLD_MOBILETYPE, 0,
+                    UserHandle.USER_CURRENT) != 0;
+            TelephonyIcons.updateIcons(USE_OLD_MOBILETYPE);
+        }
+    }
+    private SettingsObserver mSettingsObserver;
+
     @Override
     public void start() {
         mGroupManager = Dependency.get(NotificationGroupManager.class);
@@ -798,6 +826,10 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         mCustomSettingsObserver.observe();
         mCustomSettingsObserver.update();
+
+        mSettingsObserver = new SettingsObserver(mHandler);
+        mSettingsObserver.observe();
+        mSettingsObserver.update();
     }
 
     // ================================================================================

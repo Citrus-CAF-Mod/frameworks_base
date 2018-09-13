@@ -4160,6 +4160,12 @@ public final class Settings {
         private static final Validator BLUETOOTH_ACCEPT_ALL_FILES_VALIDATOR = BOOLEAN_VALIDATOR;
 
         /**
+         * Whether to use old mobile data icons
+         * @hide
+         */
+        public static final String USE_OLD_MOBILETYPE = "use_old_mobiletype";
+
+        /**
          * whether to enable or disable vibration on succesful fingerprint auth
          * @hide
          */
@@ -5100,6 +5106,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(DEVICE_GESTURE_FEEDBACK_ENABLED);
             PRIVATE_SETTINGS.add(DEVICE_FEATURE_SETTINGS);
             PRIVATE_SETTINGS.add(NIGHT_BRIGHTNESS_VALUE);
+            PRIVATE_SETTINGS.add(USE_OLD_MOBILETYPE);
         }
 
         /**
